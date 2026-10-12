@@ -1,0 +1,6 @@
+{
+  "required": true,
+  "package": "pl.elektryn.mixin",
+  "compatibilityLevel": "${compat}",
+  "client": ["EntityRendererMixin", "MinecraftMixin"]
+}
