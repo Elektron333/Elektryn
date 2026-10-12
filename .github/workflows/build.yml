@@ -1,0 +1,67 @@
+name: build-all-versions
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { mc: '1.14', build: '1.14.4', dep: '~1.14', variant: legacy, java: 8 }
+          - { mc: '1.14.1', build: '1.14.4', dep: '~1.14', variant: legacy, java: 8 }
+          - { mc: '1.14.2', build: '1.14.4', dep: '~1.14', variant: legacy, java: 8 }
+          - { mc: '1.14.3', build: '1.14.4', dep: '~1.14', variant: legacy, java: 8 }
+          - { mc: '1.14.4', build: '1.14.4', dep: '1.14.4', variant: legacy, java: 8 }
+          - { mc: '1.15', build: '1.15', dep: '1.15', variant: legacy, java: 8 }
+          - { mc: '1.15.1', build: '1.15.1', dep: '1.15.1', variant: legacy, java: 8 }
+          - { mc: '1.15.2', build: '1.15.2', dep: '1.15.2', variant: legacy, java: 8 }
+          - { mc: '1.16', build: '1.16', dep: '1.16', variant: legacy, java: 8 }
+          - { mc: '1.16.1', build: '1.16.1', dep: '1.16.1', variant: legacy, java: 8 }
+          - { mc: '1.16.2', build: '1.16.2', dep: '1.16.2', variant: legacy, java: 8 }
+          - { mc: '1.16.3', build: '1.16.3', dep: '1.16.3', variant: legacy, java: 8 }
+          - { mc: '1.16.4', build: '1.16.4', dep: '1.16.4', variant: legacy, java: 8 }
+          - { mc: '1.16.5', build: '1.16.5', dep: '1.16.5', variant: legacy, java: 8 }
+          - { mc: '1.17', build: '1.17', dep: '1.17', variant: legacy, java: 16 }
+          - { mc: '1.17.1', build: '1.17.1', dep: '1.17.1', variant: legacy, java: 16 }
+          - { mc: '1.18', build: '1.18', dep: '1.18', variant: legacy, java: 17 }
+          - { mc: '1.18.1', build: '1.18.1', dep: '1.18.1', variant: legacy, java: 17 }
+          - { mc: '1.18.2', build: '1.18.2', dep: '1.18.2', variant: legacy, java: 17 }
+          - { mc: '1.19', build: '1.19', dep: '1.19', variant: modern, java: 17 }
+          - { mc: '1.19.1', build: '1.19.1', dep: '1.19.1', variant: modern, java: 17 }
+          - { mc: '1.19.2', build: '1.19.2', dep: '1.19.2', variant: modern, java: 17 }
+          - { mc: '1.19.3', build: '1.19.3', dep: '1.19.3', variant: modern, java: 17 }
+          - { mc: '1.19.4', build: '1.19.4', dep: '1.19.4', variant: modern, java: 17 }
+          - { mc: '1.20', build: '1.20', dep: '1.20', variant: modern, java: 17 }
+          - { mc: '1.20.1', build: '1.20.1', dep: '1.20.1', variant: modern, java: 17 }
+          - { mc: '1.20.2', build: '1.20.2', dep: '1.20.2', variant: modern, java: 17 }
+          - { mc: '1.20.3', build: '1.20.3', dep: '1.20.3', variant: modern, java: 17 }
+          - { mc: '1.20.4', build: '1.20.4', dep: '1.20.4', variant: modern, java: 17 }
+          - { mc: '1.20.5', build: '1.20.5', dep: '1.20.5', variant: modern, java: 21 }
+          - { mc: '1.20.6', build: '1.20.6', dep: '1.20.6', variant: modern, java: 21 }
+          - { mc: '1.21', build: '1.21', dep: '1.21', variant: modern, java: 21 }
+          - { mc: '1.21.1', build: '1.21.1', dep: '1.21.1', variant: modern, java: 21 }
+          - { mc: '1.21.2', build: '1.21.2', dep: '1.21.2', variant: modern, java: 21 }
+          - { mc: '1.21.3', build: '1.21.3', dep: '1.21.3', variant: modern, java: 21 }
+          - { mc: '1.21.4', build: '1.21.4', dep: '1.21.4', variant: modern, java: 21 }
+          - { mc: '1.21.5', build: '1.21.5', dep: '1.21.5', variant: modern, java: 21 }
+          - { mc: '1.21.6', build: '1.21.6', dep: '1.21.6', variant: modern, java: 21 }
+          - { mc: '1.21.7', build: '1.21.7', dep: '1.21.7', variant: modern, java: 21 }
+          - { mc: '1.21.8', build: '1.21.8', dep: '1.21.8', variant: modern, java: 21 }
+          - { mc: '1.21.9', build: '1.21.9', dep: '1.21.9', variant: modern, java: 21 }
+          - { mc: '1.21.10', build: '1.21.10', dep: '1.21.10', variant: modern, java: 21 }
+          - { mc: '1.21.11', build: '1.21.11', dep: '1.21.11', variant: modern, java: 21 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: 8.14 }
+      - run: >
+          gradle build
+          -Pmc=${{ matrix.mc }} -Pbuild_mc=${{ matrix.build }}
+          -Pmc_dep="${{ matrix.dep }}" -Pvariant=${{ matrix.variant }}
+          -Pjava_release=${{ matrix.java }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: elektryn-${{ matrix.mc }}
+          path: build/libs/elektryn-${{ matrix.mc }}-*.jar
